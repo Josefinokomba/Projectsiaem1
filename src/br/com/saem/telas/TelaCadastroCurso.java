@@ -59,18 +59,19 @@ public class TelaCadastroCurso extends javax.swing.JInternalFrame {
 
     public void CarregarTable(DefaultTableModel tbModelF, JTable tblFuncionario) {
         Connection conex = ModuloConexao.Conector();
-        Object[] lista = new Object[2];
-        Object[] columnNames = {"curso", "area"};
+        Object[] lista = new Object[3];
+        Object[] columnNames = {"ID","curso", "area"};
 
         tbModelF.setColumnIdentifiers(columnNames);
 
-        String sql = String.format("SELECT NomeCurso,NomeArea FROM curso, areaCurso WHERE curso.IdArea = areaCurso.IdArea");
+        String sql = String.format("SELECT IdCurso, NomeCurso,NomeArea FROM curso, areaCurso WHERE curso.IdArea = areaCurso.IdArea");
         try ( Statement stmt = conex.createStatement()) {
             stmt.execute(sql);
             try ( ResultSet rs = stmt.executeQuery(sql)) {
                 while (rs.next()) {
-                    lista[0] = (rs.getString("NomeCurso"));
-                    lista[1] = (rs.getString("NomeArea"));
+                    lista[1] = (rs.getString("NomeCurso"));
+                    lista[2] = (rs.getString("NomeArea"));
+                    lista[0] = (rs.getString("IdCurso"));
                     tbModelF.addRow(lista);
                 }
                 tblFuncionario.setModel(tbModelF);
@@ -117,6 +118,11 @@ public class TelaCadastroCurso extends javax.swing.JInternalFrame {
         btnAlterarCurso.setText("Alterar");
 
         btnApagarCurso.setText("Apagar");
+        btnApagarCurso.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnApagarCursoActionPerformed(evt);
+            }
+        });
 
         tblConsultarCurso.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -221,6 +227,30 @@ public class TelaCadastroCurso extends javax.swing.JInternalFrame {
             ex.printStackTrace();
         }
     }//GEN-LAST:event_btnCriarCursoActionPerformed
+
+    private void btnApagarCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApagarCursoActionPerformed
+        // TODO add your handling code here:
+        
+        Connection conex = ModuloConexao.Conector();
+        int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover determinado Curso?");
+        if (confirma == JOptionPane.YES_NO_OPTION) {
+            int a = tblConsultarCurso.getSelectedRow();
+            int curso = Integer.parseInt(tbModel.getValueAt(a, 0).toString());
+
+            try ( PreparedStatement stmt = conex.prepareStatement("DELETE FROM curso WHERE IdCurso = ? ")) {
+                stmt.setInt(1, curso);
+                stmt.execute();
+                JOptionPane.showMessageDialog(null, "Eliminado com sucesso");
+                System.out.println("Elim sucesso");
+                tbModel = new DefaultTableModel();
+                CarregarTable(tbModel, tblConsultarCurso);
+
+            } catch (SQLException ex) {
+
+                ex.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_btnApagarCursoActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

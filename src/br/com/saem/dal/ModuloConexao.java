@@ -28,7 +28,7 @@ public class ModuloConexao {
             return conexao;
         }catch(Exception e){
             //A linha a baixa mostra a excepção
-            //System.out.println(e);
+            System.out.println(e);
             return null;
         }
     }

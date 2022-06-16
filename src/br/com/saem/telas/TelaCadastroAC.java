@@ -6,6 +6,8 @@ package br.com.saem.telas;
 
 import java.sql.*;
 import br.com.saem.dal.ModuloConexao;
+import br.com.saem.model.Areacurso;
+import br.com.saem.model.Curso;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -20,6 +22,8 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
     PreparedStatement pst = null;
     ResultSet rs = null;
     DefaultTableModel tbModel;
+    Areacurso ac = new Areacurso();
+    Curso c = new Curso();
 
     /**
      * Creates new form TelaCadastroAC
@@ -33,17 +37,19 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
 
     public void CarregarTable(DefaultTableModel tbModelF, JTable tblFuncionario) {
         Connection conex = ModuloConexao.Conector();
-        Object[] lista = new Object[1];
-        Object[] columnNames = {"Nome"};
+        Object[] lista = new Object[2];
+        Object[] columnNames = {"ID","Nome"};
 
         tbModelF.setColumnIdentifiers(columnNames);
 
-        String sql = String.format("SELECT NomeArea FROM areaCurso");
+        String sql = String.format("SELECT * FROM areaCurso");
         try ( Statement stmt = conex.createStatement()) {
             stmt.execute(sql);
             try ( ResultSet rs = stmt.executeQuery(sql)) {
                 while (rs.next()) {
-                    lista[0] = (rs.getString("NomeArea"));
+                    lista[1] = (rs.getString("NomeArea"));
+                    lista[0] = (rs.getInt(1));
+                    
                     tbModelF.addRow(lista);
                 }
                 tblFuncionario.setModel(tbModelF);
@@ -53,22 +59,6 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
             ex.printStackTrace();
 
         }
-    }
-
-    private void remover() {
-        int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover determinada Área?");
-        if (confirma == JOptionPane.YES_NO_OPTION) {
-            String sql = "delete from areaCurso where IdArea = ?";
-
-            try {
-                pst = conexao.prepareStatement(sql);
-//                pst.setString(1, tblConsultarArea.tableChanged(e));
-                pst.executeUpdate();
-            } catch (Exception e) {
-                JOptionPane.showConfirmDialog(null, e);
-            }
-        }
-
     }
 
     /**
@@ -214,13 +204,14 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
         Connection conex = ModuloConexao.Conector();
         int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover determinada Área?");
         if (confirma == JOptionPane.YES_NO_OPTION) {
-            String sql = "delete from areaCurso where IdArea = ?";
+            int a = tblConsultarArea.getSelectedRow();
+            int area = (int) tblConsultarArea.getValueAt(a, 0);
 
-            try ( PreparedStatement stmt = conex.prepareStatement("DELETE INTO areaCurso(NomeArea)"
-                    + "VALUES (?) ")) {
-                stmt.setString(1, txtCriarArea.getText());
-                JOptionPane.showMessageDialog(null, "Cadastrado com sucesso");
-                System.out.println("Cad sucesso");
+            try ( PreparedStatement stmt = conex.prepareStatement("DELETE FROM siaem.areacurso WHERE IdArea = ? ")) {
+                stmt.setInt(1, area);
+                stmt.execute();
+                JOptionPane.showMessageDialog(null, "Eliminado com sucesso");
+                System.out.println("Elim sucesso");
                 txtCriarArea.setText(" ");
                 tbModel = new DefaultTableModel();
                 CarregarTable(tbModel, tblConsultarArea);

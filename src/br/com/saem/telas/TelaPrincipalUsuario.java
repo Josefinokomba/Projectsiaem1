@@ -28,7 +28,7 @@ String NomeF;
         initComponents();
         NomeF = senha;
         CarregarComboArea();
-        cmbAreaUser.setSelectedIndex(1);
+        cmbAreaUser.setSelectedIndex(0);
         ControlarEstado();
 //        deboy = (cmbAreaUser.getItemAt(1));
 //        System.out.println(cmbCursoUser.getItemAt(1).toString());
@@ -45,6 +45,7 @@ String NomeF;
                  rs.next();
                    
                    if(rs.getInt("estado") == 1){
+                       
                        lblEstado.setText("Estado: Inscrito");
                        jButton2.setEnabled(false);
                    }
@@ -260,7 +261,7 @@ String NomeF;
             stmt.execute();
 //            JOptionPane.showMessageDialog(null, "Cadastrado com sucesso");
             System.out.println("Cad sucesso");
-            jButton2.setVisible(false);
+            ControlarEstado();
             
 
         } catch (SQLException ex) {

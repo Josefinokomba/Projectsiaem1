@@ -62,7 +62,7 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
 
             try {
                 pst = conexao.prepareStatement(sql);
-                pst.setString(1, tblConsultarArea.tableChanged(e));
+//                pst.setString(1, tblConsultarArea.tableChanged(e));
                 pst.executeUpdate();
             } catch (Exception e) {
                 JOptionPane.showConfirmDialog(null, e);

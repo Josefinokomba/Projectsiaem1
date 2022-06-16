@@ -101,6 +101,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Alterar"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnAlterarCursoActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnApagarCurso">
       <Properties>
@@ -155,6 +158,9 @@
               <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tblConsultarCursoMouseClicked"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

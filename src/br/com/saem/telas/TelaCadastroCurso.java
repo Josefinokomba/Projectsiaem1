@@ -31,7 +31,14 @@ public class TelaCadastroCurso extends javax.swing.JInternalFrame {
     public TelaCadastroCurso() {
         initComponents();
         CarregarComboArea();
-        tbModel = new DefaultTableModel();
+        tbModel = new DefaultTableModel() {
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+
+            }
+        };
         CarregarTable(tbModel, tblConsultarCurso);
     }
 
@@ -60,7 +67,7 @@ public class TelaCadastroCurso extends javax.swing.JInternalFrame {
     public void CarregarTable(DefaultTableModel tbModelF, JTable tblFuncionario) {
         Connection conex = ModuloConexao.Conector();
         Object[] lista = new Object[3];
-        Object[] columnNames = {"ID","curso", "area"};
+        Object[] columnNames = {"ID", "curso", "area"};
 
         tbModelF.setColumnIdentifiers(columnNames);
 
@@ -116,6 +123,11 @@ public class TelaCadastroCurso extends javax.swing.JInternalFrame {
         });
 
         btnAlterarCurso.setText("Alterar");
+        btnAlterarCurso.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAlterarCursoActionPerformed(evt);
+            }
+        });
 
         btnApagarCurso.setText("Apagar");
         btnApagarCurso.addActionListener(new java.awt.event.ActionListener() {
@@ -135,6 +147,11 @@ public class TelaCadastroCurso extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblConsultarCurso.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblConsultarCursoMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblConsultarCurso);
 
         cmbAreaCurso.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -197,19 +214,18 @@ public class TelaCadastroCurso extends javax.swing.JInternalFrame {
         try {
             PreparedStatement pst = null;
 
-        pst = conex.prepareStatement(sql);
+            pst = conex.prepareStatement(sql);
 
-        pst.setString(1, cmbAreaCurso.getSelectedItem().toString());
+            pst.setString(1, cmbAreaCurso.getSelectedItem().toString());
 
-        //a linha abaixo executa a query(consulta)
-        ResultSet rs = pst.executeQuery();
-        rs.next();
-        IdArea = rs.getInt("IdArea");
+            //a linha abaixo executa a query(consulta)
+            ResultSet rs = pst.executeQuery();
+            rs.next();
+            IdArea = rs.getInt("IdArea");
         } catch (Exception e) {
         }
-        
-        //se existir um usuário e senha correspondente
 
+        //se existir um usuário e senha correspondente
         try ( PreparedStatement stmt = conex.prepareStatement("INSERT INTO curso(NomeCurso, IdArea) "
                 + "VALUES (?,?) ")) {
             stmt.setString(1, txtCriarCurso.getText());
@@ -220,7 +236,6 @@ public class TelaCadastroCurso extends javax.swing.JInternalFrame {
             txtCriarCurso.setText(" ");
             tbModel = new DefaultTableModel();
             CarregarTable(tbModel, tblConsultarCurso);
-          
 
         } catch (SQLException ex) {
 
@@ -230,7 +245,7 @@ public class TelaCadastroCurso extends javax.swing.JInternalFrame {
 
     private void btnApagarCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApagarCursoActionPerformed
         // TODO add your handling code here:
-        
+
         Connection conex = ModuloConexao.Conector();
         int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover determinado Curso?");
         if (confirma == JOptionPane.YES_NO_OPTION) {
@@ -242,7 +257,14 @@ public class TelaCadastroCurso extends javax.swing.JInternalFrame {
                 stmt.execute();
                 JOptionPane.showMessageDialog(null, "Eliminado com sucesso");
                 System.out.println("Elim sucesso");
-                tbModel = new DefaultTableModel();
+                tbModel = new DefaultTableModel() {
+
+                    @Override
+                    public boolean isCellEditable(int row, int column) {
+                        return false;
+
+                    }
+                };
                 CarregarTable(tbModel, tblConsultarCurso);
 
             } catch (SQLException ex) {
@@ -251,6 +273,74 @@ public class TelaCadastroCurso extends javax.swing.JInternalFrame {
             }
         }
     }//GEN-LAST:event_btnApagarCursoActionPerformed
+
+    private void tblConsultarCursoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblConsultarCursoMouseClicked
+        // TODO add your handling code here:
+        btnApagarCurso.setEnabled(true);
+        if (evt.getClickCount() == 2) {
+            int j = tblConsultarCurso.getSelectedRow();
+            String curso = tblConsultarCurso.getValueAt(j, 1).toString();
+            String area = tblConsultarCurso.getValueAt(j, 2).toString();
+            txtCriarCurso.setText(curso);
+            cmbAreaCurso.setSelectedItem(area);
+            btnCriarCurso.setEnabled(false);
+            btnAlterarCurso.setEnabled(true);
+            btnApagarCurso.setEnabled(false);
+        }
+    }//GEN-LAST:event_tblConsultarCursoMouseClicked
+
+    private void btnAlterarCursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlterarCursoActionPerformed
+        // TODO add your handling code here:
+
+        Connection conex = ModuloConexao.Conector();
+        String sql = "select IdArea from areaCurso WHERE NomeArea = ?";
+
+        // as linhas a baixo preparam a consulta a BD em função do que foi digitado nas caixas e texto
+        //O ? interroga é substituido pelo conteúdo das váriaveis
+        try {
+            PreparedStatement pst = null;
+
+            pst = conex.prepareStatement(sql);
+
+            pst.setString(1, cmbAreaCurso.getSelectedItem().toString());
+
+            //a linha abaixo executa a query(consulta)
+            ResultSet rs = pst.executeQuery();
+            rs.next();
+            IdArea = rs.getInt("IdArea");
+        } catch (Exception e) {
+        }
+
+        int j = tblConsultarCurso.getSelectedRow();
+        String curso = tblConsultarCurso.getValueAt(j, 0).toString();
+
+        try ( PreparedStatement stmt = conex.prepareStatement("UPDATE curso SET NomeCurso = ?, IdArea = ? "
+                + "WHERE IdCurso = ? ")) {
+            stmt.setString(1, txtCriarCurso.getText());
+            stmt.setInt(2, IdArea);
+            stmt.setInt(3, Integer.parseInt(curso));
+            stmt.execute();
+
+            JOptionPane.showMessageDialog(null, "Alterado com sucesso");
+            System.out.println("Alter sucesso");
+            txtCriarCurso.setText(" ");
+            btnCriarCurso.setEnabled(true);
+            btnAlterarCurso.setEnabled(false);
+            tbModel = new DefaultTableModel() {
+
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+
+                }
+            };
+            CarregarTable(tbModel, tblConsultarCurso);
+
+        } catch (SQLException ex) {
+
+            ex.printStackTrace();
+        }
+    }//GEN-LAST:event_btnAlterarCursoActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

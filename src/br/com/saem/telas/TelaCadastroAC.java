@@ -206,6 +206,18 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
         if (confirma == JOptionPane.YES_NO_OPTION) {
             int a = tblConsultarArea.getSelectedRow();
             int area = (int) tblConsultarArea.getValueAt(a, 0);
+            
+            try ( PreparedStatement stmt = conex.prepareStatement("DELETE FROM curso WHERE IdArea = ? ")) {
+                stmt.setInt(1, area);
+                stmt.execute();
+                System.out.println("Elim Curso com sucesso");
+                
+
+            } catch (SQLException ex) {
+
+                ex.printStackTrace();
+            }
+            
 
             try ( PreparedStatement stmt = conex.prepareStatement("DELETE FROM siaem.areacurso WHERE IdArea = ? ")) {
                 stmt.setInt(1, area);

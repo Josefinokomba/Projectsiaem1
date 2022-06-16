@@ -38,7 +38,7 @@ String NomeF;
     private void ControlarEstado(){
         Connection conex = ModuloConexao.Conector();
 
-        String sql = String.format("SELECT*FROM candidatura where Senha = %s", NomeF);
+        String sql = String.format("SELECT*FROM candidatura where Senha = '%s'", NomeF);
         try ( Statement stmt = conex.createStatement()) {
             stmt.execute(sql);
             try ( ResultSet rs = stmt.executeQuery(sql)) {

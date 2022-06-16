@@ -31,14 +31,23 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
     public TelaCadastroAC() {
         conexao = ModuloConexao.Conector();
         initComponents();
-        tbModel = new DefaultTableModel();
+        tbModel = new DefaultTableModel() {
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+
+            }
+        };
         CarregarTable(tbModel, tblConsultarArea);
+        btnApagarArea.setEnabled(true);
+        btnAlterarArea.setEnabled(true);
     }
 
     public void CarregarTable(DefaultTableModel tbModelF, JTable tblFuncionario) {
         Connection conex = ModuloConexao.Conector();
         Object[] lista = new Object[2];
-        Object[] columnNames = {"ID","Nome"};
+        Object[] columnNames = {"ID", "Nome"};
 
         tbModelF.setColumnIdentifiers(columnNames);
 
@@ -49,7 +58,7 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
                 while (rs.next()) {
                     lista[1] = (rs.getString("NomeArea"));
                     lista[0] = (rs.getInt(1));
-                    
+
                     tbModelF.addRow(lista);
                 }
                 tblFuncionario.setModel(tbModelF);
@@ -112,6 +121,11 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblConsultarArea.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblConsultarAreaMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblConsultarArea);
 
         btnApagarArea.setText("Remover");
@@ -122,6 +136,11 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
         });
 
         btnAlterarArea.setText("Alterar");
+        btnAlterarArea.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAlterarAreaActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -186,7 +205,14 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
             JOptionPane.showMessageDialog(null, "Cadastrado com sucesso");
             System.out.println("Cad sucesso");
             txtCriarArea.setText(" ");
-            tbModel = new DefaultTableModel();
+            tbModel = new DefaultTableModel() {
+
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+
+                }
+            };
             CarregarTable(tbModel, tblConsultarArea);
 
         } catch (SQLException ex) {
@@ -206,18 +232,16 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
         if (confirma == JOptionPane.YES_NO_OPTION) {
             int a = tblConsultarArea.getSelectedRow();
             int area = (int) tblConsultarArea.getValueAt(a, 0);
-            
+
             try ( PreparedStatement stmt = conex.prepareStatement("DELETE FROM curso WHERE IdArea = ? ")) {
                 stmt.setInt(1, area);
                 stmt.execute();
                 System.out.println("Elim Curso com sucesso");
-                
 
             } catch (SQLException ex) {
 
                 ex.printStackTrace();
             }
-            
 
             try ( PreparedStatement stmt = conex.prepareStatement("DELETE FROM siaem.areacurso WHERE IdArea = ? ")) {
                 stmt.setInt(1, area);
@@ -225,16 +249,72 @@ public class TelaCadastroAC extends javax.swing.JInternalFrame {
                 JOptionPane.showMessageDialog(null, "Eliminado com sucesso");
                 System.out.println("Elim sucesso");
                 txtCriarArea.setText(" ");
-                tbModel = new DefaultTableModel();
+                tbModel = new DefaultTableModel() {
+
+                    @Override
+                    public boolean isCellEditable(int row, int column) {
+                        return false;
+
+                    }
+                };
                 CarregarTable(tbModel, tblConsultarArea);
 
             } catch (SQLException ex) {
 
                 ex.printStackTrace();
             }
+        }
     }//GEN-LAST:event_btnApagarAreaActionPerformed
 
-    }
+    private void btnAlterarAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAlterarAreaActionPerformed
+        // TODO add your handling code here:
+        Connection conex = ModuloConexao.Conector();
+        int j = tblConsultarArea.getSelectedRow();
+        String area = tblConsultarArea.getValueAt(j, 0).toString();
+
+        try ( PreparedStatement stmt = conex.prepareStatement("UPDATE areaCurso SET NomeArea = ? "
+                + "WHERE IdArea = ? ")) {
+            stmt.setString(1, txtCriarArea.getText());
+            stmt.setInt(2, Integer.parseInt(area));
+            stmt.execute();
+
+            JOptionPane.showMessageDialog(null, "Alterado com sucesso");
+            System.out.println("Alter sucesso");
+            txtCriarArea.setText(" ");
+            btnAddArea.setEnabled(true);
+            btnAlterarArea.setEnabled(false);
+            tbModel = new DefaultTableModel() {
+
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+
+                }
+            };
+            CarregarTable(tbModel, tblConsultarArea);
+
+        } catch (SQLException ex) {
+
+            ex.printStackTrace();
+        }
+
+
+    }//GEN-LAST:event_btnAlterarAreaActionPerformed
+
+    private void tblConsultarAreaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblConsultarAreaMouseClicked
+        // TODO add your handling code here:
+            btnApagarArea.setEnabled(true);
+        if (evt.getClickCount() == 2) {
+            int j = tblConsultarArea.getSelectedRow();
+            String area = tblConsultarArea.getValueAt(j, 1).toString();
+            txtCriarArea.setText(area);
+            btnAddArea.setEnabled(false);
+            btnAlterarArea.setEnabled(true);
+            btnApagarArea.setEnabled(false);
+        }
+    }//GEN-LAST:event_tblConsultarAreaMouseClicked
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAddArea;
     private javax.swing.JButton btnAlterarArea;
